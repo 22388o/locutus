@@ -14,7 +14,7 @@ use crate::{
 use super::{
     handle_op_result,
     state_machine::{StateMachine, StateMachineImpl},
-    OpError, OpEnum, OperationResult,
+    OpEnum, OpError, OperationResult,
 };
 
 pub(crate) use self::messages::SubscribeMsg;
@@ -421,7 +421,9 @@ where
 }
 
 mod messages {
+    use crate::message::InnerMessage;
     use std::fmt::Display;
+    use std::ops::Sub;
 
     use super::*;
 
@@ -451,6 +453,12 @@ mod messages {
             target: PeerKeyLocation,
             subscribed: bool,
         },
+    }
+
+    impl InnerMessage for SubscribeMsg {
+        fn id(&self) -> &Transaction {
+            Self::id(self)
+        }
     }
 
     impl SubscribeMsg {
@@ -503,10 +511,10 @@ mod test {
 
     use super::*;
     use crate::{
+        client_events::ClientRequest,
         contract::SimStoreError,
         node::test::{check_connectivity, NodeSpecification, SimNetwork},
         ring::Location,
-        client_events::ClientRequest,
     };
     use std::collections::HashMap;
 
